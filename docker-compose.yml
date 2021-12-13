@@ -1,0 +1,44 @@
+version: '3.8'
+networks:
+  backend:
+    name: app
+    driver: bridge
+volumes:
+  postgres_data:
+    driver: local
+services:
+  app:
+    image: 'document-management:latest'
+    build:
+      context: .
+    container_name: app
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgresql_db
+      - keycloak
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql_db:5432/document_management
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+    healthcheck:
+      test: curl -f http://localhost:8080/api/document-management/actuator/health || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 2
+
+  postgresql_db:
+    image: 'postgres'
+    container_name: postgresql_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=document_management
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 1m
+      timeout: 10s
+      retries: 2
