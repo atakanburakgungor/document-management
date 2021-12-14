@@ -1,5 +1,5 @@
 server:
-  port: 8090
+  port: 8081
   servlet:
     contextPath: /api/document-management
 
@@ -19,6 +19,7 @@ spring:
           include:
             - health
             - info
+            - metrics
             - prometheus
   jpa:
     hibernate:
@@ -63,3 +64,22 @@ springfox:
       v2:
         path: /api-docs
 
+# ========= Keycloak ========== #
+keycloak:
+  enabled: true
+  realm: realm
+  auth-server-url: http://127.0.0.1:9990/auth/
+  resource: document-client
+  bearer-only: true
+  use-resource-role-mappings: true
+  cors-allowed-methods: "POST, PUT, DELETE, GET, OPTIONS, PATCH"
+  cors-exposed-headers: "WWW-Authenticate,accept,content-type"
+  credentials:
+    secret: j3ykqQnaQQ5UNMMrl2hR9zTlGMGyVbC8
+  securityConstraints:
+    - authRoles:
+        - document-auth-role
+      securityCollections:
+        - name: Document-Management
+          patterns:
+            - /*

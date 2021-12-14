@@ -40,7 +40,7 @@ public class AbstractBase {
     protected final String ACCEPT = "Accept";
 
     protected final String JSON_PATH = "$";
-    protected final String JSON_PATH_ID = "$.data.id";
+    protected final String JSON_PATH_ID = "$.id";
     protected final String JSON_PATH_DATA_ID = "$.data.id";
     protected final String JSON_PATH_TITLE = "$.data.title";
     protected final String JSON_PATH_AUTHOR = "$.data.author";
