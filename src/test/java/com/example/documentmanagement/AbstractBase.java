@@ -1,17 +1,16 @@
 package com.example.documentmanagement;
 
+import com.example.documentmanagement.repository.ArticleRepository;
+import com.example.documentmanagement.repository.ReviewRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -26,33 +25,48 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureMockMvc
-@DirtiesContext
-@ContextConfiguration(classes = DocumentManagementApplication.class, loader = SpringBootContextLoader.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-public class AbstractBase {
+@SpringBootTest(classes = {DocumentManagementApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public abstract class AbstractBase {
 
-    protected final String ARTICLE_URL = "/api/document-management/article/";
-    protected final String REVIEW_URL = "/api/document-management/review";
+    protected final String ARTICLE_URL = "/article";
+    protected final String REVIEW_URL = "/review";
 
     protected final String APPLICATION_JSON = "application/json;charset=utf-8";
     protected final String CONTENT_TYPE = "Content-Type";
     protected final String ACCEPT = "Accept";
+    protected final String SLASH = "/";
 
     protected final String JSON_PATH = "$";
     protected final String JSON_PATH_ID = "$.id";
+    protected final String JSON_PATH_VERSION = "$.id";
+    protected final String JSON_PATH_ARTICLE_ID = "$.articleId";
     protected final String JSON_PATH_DATA_ID = "$.data.id";
     protected final String JSON_PATH_TITLE = "$.data.title";
+    protected final String JSON_PATH_REVIEW_CONTENT = "$.data.reviewContent";
+    protected final String JSON_PATH_REVIEWER = "$.data.reviewer";
     protected final String JSON_PATH_AUTHOR = "$.data.author";
+    protected final String JSON_PATH_PUBLISH_DATE = "$.data.publishDate";
+    protected final String JSON_PATH_STAR_COUNT = "$.data.starCount";
     protected final String JSON_PATH_ARTICLE_CONTENT = "$.data.articleContent";
 
     @Autowired
     protected MockMvc mvc;
     @Autowired
     protected TestRestTemplate template;
+    @Autowired
+    public ArticleRepository articleRepository;
+    @Autowired
+    public ReviewRepository reviewRepository;
 
     @Autowired
     public ObjectMapper objectMapper;
+
+
+    @AfterAll
+    public void flush() {
+        articleRepository.deleteAll();
+        reviewRepository.deleteAll();
+    }
 
     public String loadJsonData(String jsonFile) throws IOException {
         ClassLoader classLoader = AbstractBase.class.getClassLoader();
